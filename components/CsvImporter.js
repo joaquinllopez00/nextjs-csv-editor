@@ -21,6 +21,7 @@ export default function CsvImporter({ setParentJson, setShowImporter }, props) {
         // required, may be called several times
         // receives a list of parsed objects based on defined fields and user column mapping;
         // (if this callback returns a promise, the widget will wait for it before parsing more data)
+
         rows.forEach((row, idx) => {
           // Add row to tempObj
           setTempObj((prev) => {
@@ -33,8 +34,8 @@ export default function CsvImporter({ setParentJson, setShowImporter }, props) {
         //TODO: Stop loader animation
         //TODO: Render TextFields
         console.log(tempObj, "tempObj");
-        //Set Parent JSON to the tempObj
-        setParentJson(Object.keys(tempObj).map((obj) => tempObj[obj]));
+        //Set Parent JSON to the an array of variables, TempObj objects
+        setParentJson(Object.keys(tempObj).map((key) => tempObj[key]));
       }}
       onClose={({ file, preview, fields, columnFields }) => {
         // optional, if this is specified the user will see a "Finish" button after import is done,
@@ -54,6 +55,7 @@ export default function CsvImporter({ setParentJson, setShowImporter }, props) {
       // chunkSize={...} // defaults to 10000
       // encoding={...} // defaults to utf-8, see FileReader API
     >
+      {/* CSV Header Fields, do we want to generate these dynamically? */}
       <ImporterField name="name" label="Name" />
       <ImporterField name="email" label="Email" />
       <ImporterField name="address" label="Address" optional />
