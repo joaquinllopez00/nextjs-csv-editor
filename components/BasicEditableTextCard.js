@@ -10,7 +10,7 @@ export default function BasicEditableTextCard({ csvKey, text = "", onEdit }, pro
   };
 
   return (
-    <Box mt="4rem">
+    <Box>
       <Textarea
         value={value}
         onChange={(e) => setValue(e.target.value)}

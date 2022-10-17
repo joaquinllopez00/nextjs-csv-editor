@@ -34,7 +34,7 @@ export default function CsvImporter({ setParentJson, setShowImporter }, props) {
         //TODO: Render TextFields
         console.log(tempObj, "tempObj");
         //Set Parent JSON to the tempObj
-        setParentJson(tempObj);
+        setParentJson(Object.keys(tempObj).map((obj) => tempObj[obj]));
       }}
       onClose={({ file, preview, fields, columnFields }) => {
         // optional, if this is specified the user will see a "Finish" button after import is done,

@@ -1,23 +1,47 @@
-import { Container, Center, SlideFade, Heading, SimpleGrid, Box } from "@chakra-ui/react";
+import { Container, Center, SlideFade, Heading, SimpleGrid, Box, Text, Button } from "@chakra-ui/react";
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import { useState } from "react";
+
+import Papa from "papaparse";
 
 import BasicEditableTextCard from "../components/BasicEditableTextCard";
 import CsvImporter from "../components/CsvImporter";
 
 export default function Home() {
   //Top Level JSON object of CSV data
-  const [parentJson, setParentJson] = useState({});
+  const [parentJson, setParentJson] = useState([]);
   //Toggle for the CSV Importer
   const [showImporter, setShowImporter] = useState(true);
 
+  //
+
   const onEdit = (key, value) => {
-    console.log("onEdit", key, value);
-    setParentJson((prev) => {
-      return { ...prev, [key]: { ...prev[key], name: value } };
+    // [{{}, {}, {} }]
+
+    let filteredObj = parentJson.filter((el) => {
+      return el !== parentJson[key];
     });
+    console.log(filteredObj, "filteredObj");
+
+    setParentJson((prev) => {
+      return [{ ...prev[key], name: value }, ...filteredObj];
+    });
+  };
+
+  const exportCsv = async () => {
+    console.log(parentJson, "parentJson");
+    const csv = Papa.unparse(parentJson);
+    const blob = new Blob([csv], { type: "text/csv" });
+    const href = await URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = href;
+    link.download = "myFile.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    console.log(csv, "csv");
   };
 
   return (
@@ -31,7 +55,22 @@ export default function Home() {
       <main className={styles.main}>
         <Container maxW={"60%"} minH="40vh">
           <Center mb={4}>
-            <Heading>Upload CSV</Heading>
+            {Object.keys(parentJson).length > 0 ? (
+              <>
+                <Text fontSize={"2xl"} mr={6}>
+                  Ready to export?{"   "}
+                </Text>
+                <Button
+                  onClick={() => {
+                    exportCsv();
+                  }}
+                >
+                  Export CSV
+                </Button>
+              </>
+            ) : (
+              <Heading>Upload CSV</Heading>
+            )}
           </Center>
           {showImporter && (
             <SlideFade in={showImporter} hidden={!showImporter} offsetY="-10px">
@@ -45,11 +84,13 @@ export default function Home() {
               </Box>
             )}
             <Box minH="80px">
-              {parentJson &&
-                Object.keys(parentJson).length > 0 &&
+              {Object.keys(parentJson).length > 0 &&
                 Object.keys(parentJson).map((itemKey) => {
                   return (
                     <Container key={itemKey}>
+                      <Text m={0} mt={10} p={0}>
+                        {itemKey}
+                      </Text>
                       <BasicEditableTextCard csvKey={itemKey} text={parentJson[itemKey].name} onEdit={onEdit} />
                     </Container>
                   );
